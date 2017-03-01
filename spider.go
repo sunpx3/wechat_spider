@@ -3,7 +3,6 @@ package wechat_spider
 import (
 	"log"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/elazarl/goproxy"
@@ -28,7 +27,6 @@ func newSpider() *spider {
 	sp.proxy = goproxy.NewProxyHttpServer()
 
 	sp.proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
-
 	return sp
 }
 
@@ -41,7 +39,7 @@ func (s *spider) Run(port string) {
 		s.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			host := req.URL.Host
 			if !strings.Contains(host, "mp.weixin.qq.com") {
-				req, _ = http.NewRequest("GET", "http://www.contactmeqq543950155.com/", nil)
+				req, _ = http.NewRequest("GET", "http://127.0.0.1", nil)
 				return req, nil
 			}
 			return req, nil
@@ -52,8 +50,7 @@ func (s *spider) Run(port string) {
 }
 
 var (
-	filterRegrexp = regexp.MustCompile(`http://.*\.png`)
-	rootConfig    = &Config{
+	rootConfig = &Config{
 		Verbose:    false,
 		AutoScroll: false,
 		Compress:   true,
