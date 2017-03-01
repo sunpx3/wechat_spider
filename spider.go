@@ -3,6 +3,8 @@ package wechat_spider
 import (
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/elazarl/goproxy"
 )
@@ -24,6 +26,7 @@ func Run(port string) {
 func newSpider() *spider {
 	sp := &spider{}
 	sp.proxy = goproxy.NewProxyHttpServer()
+
 	sp.proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 
 	return sp
@@ -34,24 +37,41 @@ func (s *spider) Regist(proc Processor) {
 }
 
 func (s *spider) Run(port string) {
+	if rootConfig.Compress {
+		s.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			host := req.URL.Host
+			if !strings.Contains(host, "mp.weixin.qq.com") {
+				req, _ = http.NewRequest("GET", "http://www.contactmeqq543950155.com/", nil)
+				return req, nil
+			}
+			return req, nil
+		})
+	}
 	log.Println("server will at port:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, s.proxy))
 }
 
 var (
-	rootConfig = &Config{
+	filterRegrexp = regexp.MustCompile(`http://.*\.png`)
+	rootConfig    = &Config{
 		Verbose:    false,
 		AutoScroll: false,
-		Metrics:    false,
+		Compress:   true,
 	}
 )
 
 type Config struct {
 	Verbose    bool // Debug
 	AutoScroll bool // Auto scroll page to hijack all history articles
-	Metrics    bool // Get the metrics:such as Comments and Favors
+	Compress   bool // To ingore other request just to save the net cost
 }
 
 func InitConfig(conf *Config) {
 	rootConfig = conf
+}
+
+func orPanic(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

@@ -11,7 +11,6 @@ func main() {
 	var port = "8899"
 	spider.Regist(&CustomProcessor{})
 	spider.Run(port)
-
 }
 
 //Just to implement Output Method of interface{} Processor
