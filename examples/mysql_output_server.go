@@ -15,7 +15,9 @@ import (
 )
 
 /**
+	## mysql server in localhost:4000
 	create database wechat;
+	use wechat;
 	create table wx_article(id bigint(15) not null primary key , url varchar(512), data text, update_time bigint(15));
 **/
 

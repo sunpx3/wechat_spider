@@ -14,9 +14,13 @@
 通过Man-In-Middle 代理方式获取微信服务端返回,自动模拟请求自动分页,抓取对应点击的所有历史文章
 
 ## 客户端:  
-win,macos,android,iPhone等客户端平台
+android,iPhone等微信客户端平台, win和osx的微信客户端暂不兼容
 
 代理协议: http && https,  https需要导入certs文件夹的goproxy证书,并且添加受信权限,详细教程请google
+
+
+## Install
+ 依赖go1.7环境,`go get github.com/sundy-li/wechat_spider`
 
 ## 代理服务端
 - 15行代码实现一个简单的爬虫服务  [simple_server.go][1]
