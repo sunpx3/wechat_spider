@@ -39,7 +39,7 @@ func (s *spider) Run(port string) {
 		s.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			host := req.URL.Host
 			if !strings.Contains(host, "mp.weixin.qq.com") {
-				req, _ = http.NewRequest("GET", "http://127.0.0.1", nil)
+				req, _ = http.NewRequest("GET", "http://mp.weixin.qq.com/notfound", nil)
 				return req, nil
 			}
 			return req, nil
