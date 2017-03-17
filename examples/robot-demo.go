@@ -1,15 +1,14 @@
 package main
 
 import (
-	robot "github.com/go-vgo/robotgo"
-	"fmt"
-	"time"
-	"log"
-	"net/http"
-	"io/ioutil"
-	"net/url"
 	"flag"
-	"encoding/json"
+	"fmt"
+	"log"
+	"math/rand"
+	"net/http"
+	"time"
+
+	robot "github.com/go-vgo/robotgo"
 )
 
 type Point struct {
@@ -20,35 +19,16 @@ type Point struct {
 var (
 	counter = 1
 	//点击链接的位置
-	LinkPoint = Point{1638, 608}
-	
+	LinkPoint  = Point{1638, 608}
 	ClosePoint = Point{1251, 163}
 	InputPoint = Point{1372, 768}
 	client     *http.Client
-	
-	stop bool = false
-	
-	proxy string = "http://10.0.0.134:8899"
-	
-	nowUrl string
+
+	stop bool
 )
 
 func initFlag() {
-	flag.StringVar(&proxy, "proxy", "http://10.0.0.134:8899", "run port")
 	flag.Parse()
-	fmt.Println("代理地址：", proxy)
-}
-
-func initClient() {
-	u, err := url.Parse(proxy)
-	if err != nil {
-		//log.Println("err to parse proxy url")
-		panic(err)
-		//panic(fmt.Sprintf("err to parse proxy url: %s", proxy))
-	}
-	f := http.ProxyURL(u)
-	transport := &http.Transport{Proxy: f}
-	client = &http.Client{Transport: transport}
 }
 
 func initPoint() {
@@ -57,13 +37,13 @@ func initPoint() {
 	x, y := robot.GetMousePos()
 	LinkPoint = Point{x, y}
 	fmt.Println(LinkPoint)
-	
+
 	//fmt.Println("输入点击关闭微信文章窗口的位置")
 	//sleep(2)
 	//x, y = robot.GetMousePos()
 	//ClosePoint = Point{x, y}
 	//fmt.Println(ClosePoint)
-	
+
 	fmt.Println("输入输入框的位置")
 	sleep(2)
 	x, y = robot.GetMousePos()
@@ -80,40 +60,7 @@ func sleep(n int) {
 }
 
 func NextUrl() string {
-	return getNextUrl()
-}
-
-type Article struct {
-	Url       string `json:"url"`
-	Id        string `json:"_id"`
-	Title     string `json:"title"`
-	UpdateTme int64 `json:"update_tme"`
-}
-
-func getNextUrl() string {
-	req, err := http.NewRequest("GET", "http://mp.weixin.qq.com/proxy/nexturl?url="+nowUrl, nil)
-	if err != nil {
-		log.Println("init next url req err")
-		return ""
-	}
-	
-	resp, err := client.Do(req)
-	if err != nil || resp == nil {
-		log.Println("get next request err")
-		return ""
-	}
-	defer resp.Body.Close()
-	
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println("read resp err")
-		return ""
-	}
-	
-	article := &Article{}
-	json.Unmarshal(body, article)
-	
-	return article.Url
+	return _urls[rand.Intn(len(_urls))]
 }
 
 func stopRobot() {
@@ -126,35 +73,30 @@ func stopRobot() {
 
 func process() {
 	fmt.Printf("requested: %d %s \n", counter, time.Now().String())
-	
 	u := NextUrl()
 	if u == "" {
 		sleep(10)
 		return
 	}
 	robot.TypeString(u)
-	
 	robot.KeyTap("enter")
-	
 	robot.MoveMouseSmooth(LinkPoint.x, LinkPoint.y, 0.5)
 	robot.Click(LinkPoint.x, LinkPoint.y)
+
 	//
 	//robot.MoveMouseSmooth(ClosePoint.x, ClosePoint.y, 0.5)
 	//robot.Click(ClosePoint.x, ClosePoint.y)
 	//
 	robot.MoveMouseSmooth(InputPoint.x, InputPoint.y, 0.5)
 	robot.Click(InputPoint.x, InputPoint.y)
-	
+
 	counter = counter + 1
 }
 
-
 func init() {
 	initFlag()
-	initClient()
 	initPoint()
 }
-
 func start() {
 	go stopRobot()
 	for !stop {
@@ -166,3 +108,13 @@ func start() {
 func main() {
 	start()
 }
+
+var (
+	_urls = []string{
+		"http://mp.weixin.qq.com/s?__biz=MzI2MzMxNzEzNA==&mid=2247484076&idx=1&sn=2b4b1dd2001d525e08966be9198d3f8d&scene=2&srcid=0804vRsESdgOtdaWTx4CET9Y&from=timeline&isappinstalled=0#wechat_redirect",
+
+		"http://mp.weixin.qq.com/s?__biz=MjM5MDMyMzg2MA==&mid=2655481188&idx=1&sn=b22c1b7089ef132724d5c35b82372cb3&chksm=bdf5489f8a82c1895c72f488602a1f09b2ba7821a61d2499bf6ad35c88dcfa737af6675065a7#rd",
+
+		"http://mp.weixin.qq.com/s?__biz=MjM5MDMyMzg2MA==&mid=2655481311&idx=4&sn=96a00896b5c800325ba5fc978ec15614&chksm=bdf548248a82c13223989f9469219a040d53c145eb9db4c309a6f4dfb1e4ed1a76dcc22b7196#rd",
+	}
+)

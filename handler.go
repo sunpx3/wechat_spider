@@ -31,7 +31,7 @@ func ProxyHandle(proc Processor) func(resp *http.Response, ctx *goproxy.ProxyCtx
 			header = ctx.Req.Header
 		} else if ctx.Req.URL.Path == `/s` {
 			header = ctx.Req.Header
-			//handleDetail(resp, ctx, proc)
+			handleDetail(resp, ctx, proc)
 		} else if ctx.Req.URL.Path == "/mp/getappmsgext" {
 			header = ctx.Req.Header
 			handleMetrics(resp, ctx, proc)
