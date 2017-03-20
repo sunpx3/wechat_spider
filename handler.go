@@ -33,7 +33,6 @@ func ProxyHandle(proc Processor) func(resp *http.Response, ctx *goproxy.ProxyCtx
 			header = ctx.Req.Header
 			handleDetail(resp, ctx, proc)
 		} else if ctx.Req.URL.Path == "/mp/getappmsgext" {
-			header = ctx.Req.Header
 			handleMetrics(resp, ctx, proc)
 		}
 		return resp
