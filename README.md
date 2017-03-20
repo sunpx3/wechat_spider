@@ -77,8 +77,8 @@ func main() {
 
 * 模拟点击实现批量化
 
- ### Go版本(强烈推荐)
-	适用于Mac & &Windows, 用法参考 [robot-demo.go][5]	
+ ### Go版本(强烈推荐), 用法参考 [robot-demo.go][5]	
+	适用于Mac & &Windows
 
  ### Python版本(比较麻烦,不推荐使用)
 	只适用于windows端 :  Windows客户端获取批量公众号所有历史文章方法,对应原理请参考 http://stackbox.cn/2016-07-21-weixin-spider-notes/ ,同时也感谢博文作者提供此windows模拟点击的思路 
