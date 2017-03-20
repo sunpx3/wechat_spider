@@ -12,8 +12,6 @@
 ## 常见问题
   [FAQ][3]
 
-## 代理服务端: 
-通过Man-In-Middle 代理方式获取微信服务端返回,自动模拟请求自动分页,抓取对应点击的所有历史文章
 
 ## 客户端:  
 android,iPhone等微信客户端平台, win和osx的微信客户端暂不兼容
@@ -26,6 +24,7 @@ android,iPhone等微信客户端平台, win和osx的微信客户端暂不兼容
  `go get github.com/sundy-li/wechat_spider`
 
 ## 代理服务端
+通过Man-In-Middle 代理方式获取微信服务端返回,自动模拟请求自动分页,抓取对应点击的所有历史文章
 - 15行代码实现一个简单的爬虫服务  [simple_server.go][1]
 
 ```
@@ -56,6 +55,7 @@ func main() {
 [2]: https://github.com/sundy-li/wechat_spider/blob/master/examples/custom_output_server.go
 [3]: https://github.com/sundy-li/wechat_spider/blob/master/docs/FAQ.md
 [4]: https://github.com/sundy-li/wechat_spider/blob/master/examples/custom_output_detail_server.go
+[5]: https://github.com/sundy-li/wechat_spider/blob/master/examples/robot-demo.go
 
 * 微信会屏蔽频繁的请求,所以历史文章的翻页请求调用了Sleep()方法, 默认每个请求休眠50ms,可以根据实际情况自定义Processor覆盖此方法
 
@@ -73,14 +73,20 @@ func main() {
 ## 批量化
 
 
-* 动态修改js实现批量化(推荐使用),参考[custom_output_server.go][2] 
+* 动态修改js实现批量化(不推荐使用,因为不方便控制),参考[custom_output_server.go][2] 
 
-* 模拟点击实现批量化(比较麻烦,不推荐使用)
-	windows端 :  Windows客户端获取批量公众号所有历史文章方法,对应原理请参考 http://stackbox.cn/2016-07-21-weixin-spider-notes/ ,同时也感谢博文作者提供此windows模拟点击的思路 
+* 模拟点击实现批量化
 
-  1. 要求安装windows +  微信pc版本 + ActivePython3 + autogui, 设置windows下全局代理对应 代理服务端的服务和端口
-  2. 修改 win_client.py 中的 bizs参数, 通过pyautogui.position() 瞄点设置 first_ret, rel_link 坐标
-  3. 在examples目录下面, 执行 python win_client.py 将自动生成链接,模拟点击
+ ### Go版本(强烈推荐)
+	适用于Mac & &Windows, 用法参考 [robot-demo.go][5]	
+
+ ### Python版本(比较麻烦,不推荐使用)
+	只适用于windows端 :  Windows客户端获取批量公众号所有历史文章方法,对应原理请参考 http://stackbox.cn/2016-07-21-weixin-spider-notes/ ,同时也感谢博文作者提供此windows模拟点击的思路 
+	  1. 要求安装windows +  微信pc版本 + ActivePython3 + autogui, 设置windows下全局代理对应 代理服务端的服务和端口
+	  2. 修改 win_client.py 中的 bizs参数, 通过pyautogui.position() 瞄点设置 first_ret, rel_link 坐标
+	  3. 在examples目录下面, 执行 python win_client.py 将自动生成链接,模拟点击
+
+
 
 ## TODO
 * ~~点赞数,阅读数~~  ← Complete!
