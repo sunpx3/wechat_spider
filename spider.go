@@ -18,6 +18,10 @@ func Regist(proc Processor) {
 	_spider.Regist(proc)
 }
 
+func OnReq(f func(ctx *goproxy.ProxyCtx) (*http.Request, *http.Response)) {
+	_spider.OnReq(f)
+}
+
 func Run(port string) {
 	_spider.Run(port)
 }
@@ -30,19 +34,30 @@ func newSpider() *spider {
 	return sp
 }
 
+func Header() http.Header {
+	return header
+}
+
 func (s *spider) Regist(proc Processor) {
 	s.proxy.OnResponse().DoFunc(ProxyHandle(proc))
 }
 
+func (s *spider) OnReq(f func(ctx *goproxy.ProxyCtx) (*http.Request, *http.Response)) {
+	handler := func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		return f(ctx)
+	}
+	s.proxy.OnRequest().DoFunc(handler)
+}
+
 func (s *spider) Run(port string) {
 	if rootConfig.Compress {
-		s.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			host := req.URL.Host
+		s.OnReq(func(ctx *goproxy.ProxyCtx) (req *http.Request, resp *http.Response) {
+			host := ctx.Req.URL.Host
+			req = ctx.Req
 			if !strings.Contains(host, "mp.weixin.qq.com") {
-				req, _ = http.NewRequest("GET", "http://mp.weixin.qq.com/notfound", nil)
-				return req, nil
+				resp = goproxy.NewResponse(req, "text/html", http.StatusNotFound, "")
 			}
-			return req, nil
+			return
 		})
 	}
 	log.Println("server will at port:" + port)
@@ -50,6 +65,8 @@ func (s *spider) Run(port string) {
 }
 
 var (
+	header http.Header //全局缓存wechat header
+
 	rootConfig = &Config{
 		Verbose:    false,
 		AutoScroll: false,

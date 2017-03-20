@@ -28,14 +28,15 @@ func ProxyHandle(proc Processor) func(resp *http.Response, ctx *goproxy.ProxyCtx
 
 		if ctx.Req.URL.Path == `/mp/getmasssendmsg` || (ctx.Req.URL.Path == `/mp/profile_ext` && ctx.Req.URL.Query().Get("action") == "home") {
 			handleList(resp, ctx, proc)
+			header = ctx.Req.Header
 		} else if ctx.Req.URL.Path == `/s` {
+			header = ctx.Req.Header
 			handleDetail(resp, ctx, proc)
 		} else if ctx.Req.URL.Path == "/mp/getappmsgext" {
 			handleMetrics(resp, ctx, proc)
 		}
 		return resp
 	}
-
 }
 
 func handleList(resp *http.Response, ctx *goproxy.ProxyCtx, proc Processor) {
