@@ -87,6 +87,10 @@ func main() {
 	  3. 在examples目录下面, 执行 python win_client.py 将自动生成链接,模拟点击
 
 
+## 配置说明
+* AutoScroll : 自动翻页
+* Compress : 过滤其他域的请求,节省带宽
+* Verbose : 是否打印一些log
 
 ## TODO
 * ~~点赞数,阅读数~~  ← Complete!
