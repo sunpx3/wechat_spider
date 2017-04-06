@@ -68,6 +68,8 @@ func stopRobot() {
 
 func process() {
 	fmt.Printf("requested: %d %s \n", counter, time.Now().String())
+
+	//这里实现批量化即可
 	nextUrl := NextUrl()
 	if nextUrl == "" {
 		return

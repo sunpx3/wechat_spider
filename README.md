@@ -49,8 +49,8 @@ func main() {
 ```
 
 * 上面贴的是一个精简的服务端,拦截客户端请求,将微信文章url打印到终端
-* ~~(js跳转由于微信新规则已经不可用)如果想自定义输出源以及实现批量自动化爬取,可以实现`Processor`接口的`Output`和`NextBiz`方法, 参考  [custom_output_server.go][2]~~
-* ~~(js跳转由于微信新规则已经不可用)抓取阅读数,点赞数请实现`Processor`接口的`Output`和`NextUrl`方法,参考[custom_output_detail_server.go][4]~~
+* js跳转由于微信新规则已经不可用 ~~如果想自定义输出源以及实现批量自动化爬取,可以实现`Processor`接口的`Output`和`NextBiz`方法, 参考  [custom_output_server.go][2]~~
+* js跳转由于微信新规则已经不可用 ~~抓取阅读数,点赞数请实现`Processor`接口的`Output`和`NextUrl`方法,参考[custom_output_detail_server.go][4]~~
 
 
 [1]: https://github.com/sundy-li/wechat_spider/blob/master/examples/simple_server.go
@@ -72,15 +72,14 @@ func main() {
 *  win/mac客户端,设置下全局代理对应 代理服务端的服务和端口,同理点击任一公众号查看历史文章按钮
 
 
-## 批量化
+## 批量自动化
 
+* js跳转由于微信新规则已经不可用 ~~动态修改js实现批量化(不推荐使用,因为不方便控制),参考[custom_output_server.go][2]~~ 
 
-* ~~(js跳转由于微信新规则已经不可用)动态修改js实现批量化(不推荐使用,因为不方便控制),参考[custom_output_server.go][2]~~ 
-
-* 模拟点击实现批量化
+* 模拟点击实现批量自动化
 
  ### Go版本(强烈推荐), 用法参考 [robot-demo.go][5]	
-	适用于Mac & &Windows
+	适用于Mac && Windows
 
  ### Python版本(比较麻烦,不推荐使用)
 	只适用于windows端 :  Windows客户端获取批量公众号所有历史文章方法,对应原理请参考 http://stackbox.cn/2016-07-21-weixin-spider-notes/ ,同时也感谢博文作者提供此windows模拟点击的思路 

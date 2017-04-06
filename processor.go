@@ -22,10 +22,7 @@ type Processor interface {
 	ProcessList(resp *http.Response, ctx *goproxy.ProxyCtx) ([]byte, error)
 	ProcessDetail(resp *http.Response, ctx *goproxy.ProxyCtx) ([]byte, error)
 	ProcessMetrics(resp *http.Response, ctx *goproxy.ProxyCtx) ([]byte, error)
-	NextBiz(currentBiz string) string
-	HistoryUrl() string
 	Output()
-	NextUrl(currentUrl string) string
 }
 
 type BaseProcessor struct {
@@ -88,7 +85,6 @@ func (p *BaseProcessor) init(req *http.Request, data []byte) (err error) {
 	p.data = data
 	p.currentIndex = -1
 	p.biz = req.URL.Query().Get("__biz")
-	p.historyUrl = req.URL.String()
 	fmt.Println("Running a new wechat processor, please wait...")
 	return nil
 }
@@ -157,18 +153,6 @@ func (p *BaseProcessor) ProcessMetrics(resp *http.Response, ctx *goproxy.ProxyCt
 	p.detailResult = detailResult
 
 	return
-}
-
-func (p *BaseProcessor) NextBiz(currentBiz string) string {
-	return ""
-}
-
-func (p *BaseProcessor) NextUrl(currentUrl string) string {
-	return ""
-}
-
-func (p *BaseProcessor) HistoryUrl() string {
-	return p.historyUrl
 }
 
 func (p *BaseProcessor) Sleep() {

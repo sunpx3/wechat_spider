@@ -2,7 +2,6 @@ package wechat_spider
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -46,17 +45,7 @@ func handleList(resp *http.Response, ctx *goproxy.ProxyCtx, proc Processor) {
 		log.Println(err.Error())
 	}
 	go p.Output()
-
-	nextUrl := ""
-	curBiz := ctx.Req.URL.Query().Get("__biz")
-	nextBiz := p.NextBiz(curBiz)
-	if nextBiz != "" {
-		nextUrl = "https://mp.weixin.qq.com/mp/getmasssendmsg?__biz=" + nextBiz + "#wechat_webview_type=1&wechat_redirect"
-	}
 	var buf = bytes.NewBuffer(data)
-	if nextUrl != "" {
-		buf.WriteString(fmt.Sprintf(`<script>setTimeout(function(){window.location.href="%s";},2000);</script>`, nextUrl))
-	}
 	resp.Body = ioutil.NopCloser(bytes.NewReader(buf.Bytes()))
 }
 
@@ -67,12 +56,7 @@ func handleDetail(resp *http.Response, ctx *goproxy.ProxyCtx, proc Processor) {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	// When fetch metrics, list page output could be ingore
-	var nextUrl = p.NextUrl(ctx.Req.URL.String())
 	var buf = bytes.NewBuffer(data)
-	if nextUrl != "" {
-		buf.WriteString(fmt.Sprintf(`<script>window.onbeforeunload = localStorage.clear();setTimeout(function(){window.location.href="%s";},2000);</script>`, nextUrl))
-	}
 	go p.Output()
 	resp.Body = ioutil.NopCloser(bytes.NewReader(buf.Bytes()))
 }
