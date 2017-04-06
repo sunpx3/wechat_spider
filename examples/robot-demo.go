@@ -112,6 +112,7 @@ func NextUrl() string {
 }
 
 var (
+	//这里可以是 文章详情页,公众号文章列表页, 可以从操作数据库获取下一个url,或者自己实现一个调度分发器
 	_urls = []string{
 		"http://mp.weixin.qq.com/s?__biz=MzI2MzMxNzEzNA==&mid=2247484076&idx=1&sn=2b4b1dd2001d525e08966be9198d3f8d&scene=2&srcid=0804vRsESdgOtdaWTx4CET9Y&from=timeline&isappinstalled=0#wechat_redirect",
 
