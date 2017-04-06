@@ -49,8 +49,8 @@ func main() {
 ```
 
 * 上面贴的是一个精简的服务端,拦截客户端请求,将微信文章url打印到终端
-* 如果想自定义输出源以及实现批量自动化爬取,可以实现`Processor`接口的`Output`和`NextBiz`方法, 参考  [custom_output_server.go][2]
-* 抓取阅读数,点赞数请实现`Processor`接口的`Output`和`NextUrl`方法,参考[custom_output_detail_server.go][4]
+* ~~(js跳转由于微信新规则已经不可用)如果想自定义输出源以及实现批量自动化爬取,可以实现`Processor`接口的`Output`和`NextBiz`方法, 参考  [custom_output_server.go][2]~~
+* ~~(js跳转由于微信新规则已经不可用)抓取阅读数,点赞数请实现`Processor`接口的`Output`和`NextUrl`方法,参考[custom_output_detail_server.go][4]~~
 
 
 [1]: https://github.com/sundy-li/wechat_spider/blob/master/examples/simple_server.go
@@ -75,7 +75,7 @@ func main() {
 ## 批量化
 
 
-* 动态修改js实现批量化(不推荐使用,因为不方便控制),参考[custom_output_server.go][2] 
+* ~~(js跳转由于微信新规则已经不可用)动态修改js实现批量化(不推荐使用,因为不方便控制),参考[custom_output_server.go][2]~~ 
 
 * 模拟点击实现批量化
 

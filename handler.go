@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strings"
 
 	"github.com/elazarl/goproxy"
 )
@@ -52,7 +51,7 @@ func handleList(resp *http.Response, ctx *goproxy.ProxyCtx, proc Processor) {
 	curBiz := ctx.Req.URL.Query().Get("__biz")
 	nextBiz := p.NextBiz(curBiz)
 	if nextBiz != "" {
-		nextUrl = strings.Replace(ctx.Req.URL.String(), curBiz, nextBiz, -1)
+		nextUrl = "https://mp.weixin.qq.com/mp/getmasssendmsg?__biz=" + nextBiz + "#wechat_webview_type=1&wechat_redirect"
 	}
 	var buf = bytes.NewBuffer(data)
 	if nextUrl != "" {
