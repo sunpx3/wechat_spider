@@ -11,8 +11,9 @@
 
 - 微信的防作弊一直在不断更新完善,过于频繁的抓取可能导致微信账号被封禁,在需要大量抓取的任务请使用小号或者测试号进行
 
-## 常见问题
-  [FAQ][3]
+## 文档指南
+  - [群友提供的扫盲贴][6]
+  - [FAQ][3]
 
 
 ## 客户端:  
@@ -58,6 +59,7 @@ func main() {
 [3]: https://github.com/sundy-li/wechat_spider/blob/master/docs/FAQ.md
 [4]: https://github.com/sundy-li/wechat_spider/blob/master/examples/custom_output_detail_server.go
 [5]: https://github.com/sundy-li/wechat_spider/blob/master/examples/robot-demo.go
+[6]: https://gist.github.com/Josscii/bedbbebe3294b3d6de55c8256886c437
 
 * 微信会屏蔽频繁的请求,所以历史文章的翻页请求调用了Sleep()方法, 默认每个请求休眠50ms,可以根据实际情况自定义Processor覆盖此方法
 
