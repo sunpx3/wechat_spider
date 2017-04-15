@@ -68,20 +68,25 @@ var (
 	header http.Header //全局缓存wechat header
 
 	rootConfig = &Config{
-		Verbose:    false,
-		AutoScroll: false,
-		Compress:   true,
+		Verbose:     false,
+		AutoScroll:  false,
+		Compress:    true,
+		SleepSecond: 3,
 	}
 )
 
 type Config struct {
-	Verbose    bool // Debug
-	AutoScroll bool // Auto scroll page to hijack all history articles
-	Compress   bool // To ingore other request just to save the net cost
+	Verbose     bool // Debug
+	AutoScroll  bool // Auto scroll page to hijack all history articles
+	Compress    bool // To ingore other request just to save the net cost
+	SleepSecond int  // Random seconds to sleep
 }
 
 func InitConfig(conf *Config) {
 	rootConfig = conf
+	if rootConfig.SleepSecond < 1 {
+		rootConfig.SleepSecond = 3
+	}
 }
 
 func orPanic(err error) {

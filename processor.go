@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,6 +24,7 @@ type Processor interface {
 	ProcessList(resp *http.Response, ctx *goproxy.ProxyCtx) ([]byte, error)
 	ProcessDetail(resp *http.Response, ctx *goproxy.ProxyCtx) ([]byte, error)
 	ProcessMetrics(resp *http.Response, ctx *goproxy.ProxyCtx) ([]byte, error)
+	ProcessPages() error
 	Output()
 }
 
@@ -36,8 +39,8 @@ type BaseProcessor struct {
 
 	// The index of urls for detail page
 	currentIndex int
-
-	Type string
+	checked      bool
+	Type         string
 }
 
 type (
@@ -85,7 +88,7 @@ func (p *BaseProcessor) init(req *http.Request, data []byte) (err error) {
 	p.data = data
 	p.currentIndex = -1
 	p.biz = req.URL.Query().Get("__biz")
-	fmt.Println("Running a new wechat processor, please wait...")
+	p.logf("Running a new wechat processor, please wait...")
 	return nil
 }
 func (p *BaseProcessor) ProcessList(resp *http.Response, ctx *goproxy.ProxyCtx) (data []byte, err error) {
@@ -105,12 +108,6 @@ func (p *BaseProcessor) ProcessList(resp *http.Response, ctx *goproxy.ProxyCtx) 
 
 	if err = p.processMain(); err != nil {
 		return
-	}
-
-	if rootConfig.AutoScroll {
-		if err = p.processPages(); err != nil {
-			return
-		}
 	}
 	return
 }
@@ -156,7 +153,8 @@ func (p *BaseProcessor) ProcessMetrics(resp *http.Response, ctx *goproxy.ProxyCt
 }
 
 func (p *BaseProcessor) Sleep() {
-	time.Sleep(50 * time.Millisecond)
+	ti := rand.Intn(rootConfig.SleepSecond) + 1
+	time.Sleep(time.Duration(ti) * time.Second)
 }
 
 func (p *BaseProcessor) UrlResults() []*UrlResult {
@@ -215,7 +213,10 @@ func (p *BaseProcessor) processMain() error {
 	return nil
 }
 
-func (p *BaseProcessor) processPages() (err error) {
+func (p *BaseProcessor) ProcessPages() (err error) {
+	if err = p.sendCheckurl(); err != nil {
+		return
+	}
 	var pageUrl = p.genPageUrl()
 	p.logf("process pages....")
 	req, err := http.NewRequest("GET", pageUrl, nil)
@@ -232,6 +233,7 @@ func (p *BaseProcessor) processPages() (err error) {
 	}
 	bs, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
+
 	str := replacer.Replace(string(bs))
 	result := urlRegex.FindAllString(str, -1)
 	if len(result) < 1 {
@@ -241,22 +243,55 @@ func (p *BaseProcessor) processPages() (err error) {
 	if len(idMatcher) < 1 {
 		return stacktrace.Propagate(err, "Failed get page id")
 	}
-	p.lastId = idMatcher[len(idMatcher)-1][1]
-	p.logf("Page Get => %d,lastid: %s", len(result), p.lastId)
+	lastId := idMatcher[len(idMatcher)-1][1]
 	for _, u := range result {
 		p.urlResults = append(p.urlResults, &UrlResult{Url: u})
 	}
-	if p.lastId != "" {
+	if lastId != "" {
+		if p.lastId == lastId {
+			i, _ := strconv.Atoi(lastId)
+			p.lastId = fmt.Sprintf("%d", i-10)
+		} else {
+			p.lastId = lastId
+		}
 		p.Sleep()
-		return p.processPages()
+		return p.ProcessPages()
 	}
 	return nil
 }
 
 func (p *BaseProcessor) genPageUrl() string {
-	urlStr := "http://mp.weixin.qq.com/mp/getmasssendmsg?" + p.req.URL.RawQuery
-	urlStr += "&frommsgid=" + p.lastId + "&f=json&count=100"
-	return urlStr
+	p.logf("loading pages, urls size now is %d", len(p.UrlResults()))
+	otherQuery := strings.Replace(p.req.URL.RawQuery, "action=home", "", -1)
+	return fmt.Sprintf("https://mp.weixin.qq.com/mp/profile_ext?%s&frommsgid=%s&f=json&count=10&is_ok=1&action=getmsg&f=json&wxtoken=&x5=1&uin=777&key=777", otherQuery, p.lastId)
+}
+
+func (p *BaseProcessor) sendCheckurl() (err error) {
+	if p.checked {
+		return nil
+	}
+	p.checked = true
+	values := url.Values{}
+	query := p.req.URL.Query()
+	values.Add("__biz", query.Get("__biz"))
+	values.Add("scene", query.Get("scene"))
+	values.Add("url_list", "")
+	urlStr := fmt.Sprintf("http://mp.weixin.qq.com/mp/profile_ext?action=urlcheck&uin=%s&key=%s&pass_ticket=%s", query.Get("uin"), query.Get("key"), query.Get("pass_ticket"))
+
+	req, err := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
+	if err != nil {
+		return stacktrace.Propagate(err, "Failed check request")
+	}
+	for k, _ := range p.req.Header {
+		req.Header.Set(k, p.req.Header.Get(k))
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	return nil
 }
 
 func genId(urlStr string) string {

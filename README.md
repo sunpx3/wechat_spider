@@ -94,6 +94,7 @@ func main() {
 * AutoScroll : 自动翻页,必须关注后才能翻页
 * Compress : 过滤其他域的请求,节省带宽
 * Verbose : 是否打印一些log
+* SleepSecond : 翻页请求休眠时间最大值
 
 ## TODO
 * ~~点赞数,阅读数~~  ← Complete!

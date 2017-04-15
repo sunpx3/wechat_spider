@@ -20,9 +20,6 @@ func ProxyHandle(proc Processor) func(resp *http.Response, ctx *goproxy.ProxyCtx
 		if resp == nil || resp.StatusCode != 200 {
 			return resp
 		}
-		if rootConfig.Verbose {
-			Logger.Println("Hijacked of", ctx.Req.URL.RequestURI())
-		}
 
 		if ctx.Req.URL.Path == `/mp/getmasssendmsg` || (ctx.Req.URL.Path == `/mp/profile_ext` && ctx.Req.URL.Query().Get("action") == "home") {
 			handleList(resp, ctx, proc)
@@ -32,6 +29,11 @@ func ProxyHandle(proc Processor) func(resp *http.Response, ctx *goproxy.ProxyCtx
 			handleDetail(resp, ctx, proc)
 		} else if ctx.Req.URL.Path == "/mp/getappmsgext" {
 			handleMetrics(resp, ctx, proc)
+		} else {
+			return resp
+		}
+		if rootConfig.Verbose {
+			Logger.Printf("Hijacked of %s:%s", ctx.Req.Method, ctx.Req.URL.RequestURI())
 		}
 		return resp
 	}
@@ -44,7 +46,12 @@ func handleList(resp *http.Response, ctx *goproxy.ProxyCtx, proc Processor) {
 	if err != nil {
 		log.Println(err.Error())
 	}
-	go p.Output()
+	go func() {
+		if rootConfig.AutoScroll {
+			p.ProcessPages()
+		}
+		p.Output()
+	}()
 	var buf = bytes.NewBuffer(data)
 	resp.Body = ioutil.NopCloser(bytes.NewReader(buf.Bytes()))
 }
